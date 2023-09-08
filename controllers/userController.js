@@ -6,6 +6,7 @@ const { compare } = require('bcryptjs');
 const Tweet = require('../models/Tweet');
 const sendVerificationLink = require('../utils/verify');
 const Following = require('../models/following');
+const BookMark = require('../models/BookMark');
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -64,6 +65,16 @@ const showCurrenUsre = async (req, res) => {
         },
         include: [
           { model: User, attributes: ['name', 'username'], as: 'followings' },
+        ],
+      },
+      {
+        model: BookMark,
+        include: [
+          {
+            model: Tweet,
+            attributes: ['text', 'numOfLikes', 'created'],
+            include: [{ model: User, attributes: ['name', 'username'] }],
+          },
         ],
       },
     ],

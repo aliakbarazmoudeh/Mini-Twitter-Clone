@@ -43,6 +43,7 @@ app.use(cookieParser(process.env.JWT_SECRET));
 // routes
 const userRouter = require('./routes/userRoutes');
 const tweetRouter = require('./routes/tweetRoutes');
+const bookMarkRouter = require('./routes/bookMarkRoutes');
 
 app.use(express.static(path.resolve(__dirname, './public')));
 app.get('/', (req, res) => {
@@ -51,6 +52,7 @@ app.get('/', (req, res) => {
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tweets', tweetRouter);
+app.use('/api/v1/book-marks',bookMarkRouter)
 
 // not found and errors handler
 const errorHanlder = require('./middleware/error-handler');
@@ -64,10 +66,12 @@ const User = require('./models/User');
 const { QueryInterface } = require('sequelize');
 const Tweet = require('./models/Tweet');
 const Following = require('./models/following');
+const BookMark = require('./models/BookMark');
 const start = async () => {
   try {
     await connectDB.sync();
-    // await User.sync({ alter: true });
+    // await User.sync({ alter: false, force: false });
+    // await BookMark.sync({ alter: true });
     // await Tweet.sync({ alter: true });
     // await Following.sync({ alter: true });
     console.log('connected to Database ...');

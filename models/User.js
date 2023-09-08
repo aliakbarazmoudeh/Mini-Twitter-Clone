@@ -3,6 +3,7 @@ const sequelize = require('../db/connectDB');
 const { hashSync } = require('bcryptjs');
 const Tweet = require('./Tweet');
 const Following = require('./following');
+const BookMark = require('./BookMark');
 
 const User = sequelize.define('User', {
   id: {
@@ -60,7 +61,7 @@ const User = sequelize.define('User', {
 });
 
 User.hasMany(Tweet, { foreignKey: 'UserId' });
-User.hasMany(Following, { foreignKey: 'Follower'});
+User.hasMany(Following, { foreignKey: 'Follower' });
 Following.belongsTo(User, {
   as: 'followings',
   foreignKey: 'following',
@@ -69,6 +70,8 @@ Following.belongsTo(User, {
   as: 'Followers',
   foreignKey: 'Follower',
 });
+User.hasMany(BookMark, { foreignKey: 'UserId' });
+BookMark.belongsTo(Tweet, { foreignKey: 'tweetId' });
 Tweet.belongsTo(User, { foreignKey: 'UserId' });
 
 module.exports = User;
