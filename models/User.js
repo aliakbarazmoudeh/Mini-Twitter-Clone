@@ -60,8 +60,15 @@ const User = sequelize.define('User', {
 });
 
 User.hasMany(Tweet, { foreignKey: 'UserId' });
-User.hasMany(Following, { foreignKey: 'Follower' });
-Following.belongsTo(User, { foreignKey: 'following' });
+User.hasMany(Following, { foreignKey: 'Follower'});
+Following.belongsTo(User, {
+  as: 'followings',
+  foreignKey: 'following',
+});
+Following.belongsTo(User, {
+  as: 'Followers',
+  foreignKey: 'Follower',
+});
 Tweet.belongsTo(User, { foreignKey: 'UserId' });
 
 module.exports = User;

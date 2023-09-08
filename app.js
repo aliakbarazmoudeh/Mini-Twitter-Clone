@@ -67,9 +67,9 @@ const Following = require('./models/following');
 const start = async () => {
   try {
     await connectDB.sync();
-    // await Following.sync({ alter: true });
     // await User.sync({ alter: true });
     // await Tweet.sync({ alter: true });
+    // await Following.sync({ alter: true });
     console.log('connected to Database ...');
     app.listen(PORT, () =>
       console.log(`Server is listening on port ${PORT}...`)

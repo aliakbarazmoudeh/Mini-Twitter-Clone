@@ -5,6 +5,9 @@ const Following = sequelize.define('Following', {
   following: {
     type: DataTypes.INTEGER,
   },
+  Follower: {
+    type: DataTypes.INTEGER,
+  },
 });
 
 module.exports = Following;

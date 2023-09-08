@@ -51,7 +51,7 @@ const logIn = async (req, res) => {
 };
 
 const showCurrenUsre = async (req, res) => {
-  const user = await User.findByPk(req.user.UserId, {
+  let user = await User.findByPk(req.user.UserId, {
     include: [
       {
         model: Tweet,
@@ -62,13 +62,24 @@ const showCurrenUsre = async (req, res) => {
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'following', 'Follower'],
         },
-        include: [{ model: User, attributes: ['name', 'username'] }],
+        include: [
+          { model: User, attributes: ['name', 'username'], as: 'followings' },
+        ],
       },
     ],
     order: [[{ model: Tweet }, 'updatedAt', 'desc']],
-    attributes: ['name', 'username', 'email'],
+    attributes: ['id', 'name', 'username', 'email'],
   });
-  res.status(StatusCodes.OK).json(user);
+  const Followers = await Following.findAll({
+    where: { following: req.user.UserId },
+    include: [
+      { model: User, attributes: ['name', 'username'], as: 'Followers' },
+    ],
+    attributes: {
+      exclude: ['following', 'Follower', 'createdAt', 'updatedAt'],
+    },
+  });
+  res.status(StatusCodes.OK).json({ user, Followers });
 };
 
 const getSingleUser = async (req, res) => {
