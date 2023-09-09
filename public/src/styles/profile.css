@@ -497,3 +497,22 @@ div.banner {
   text-decoration: none;
   font-size: 14px;
 }
+
+.container li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.3rem;
+  color: white;
+  font-size: 14px;
+  border: none;
+  font-weight: bold;
+  border-radius: 12px;
+  background-color: #50b7f5;
+}

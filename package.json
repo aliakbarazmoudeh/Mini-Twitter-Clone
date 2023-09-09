@@ -27,6 +27,7 @@
     "rate-limiter": "^0.2.0",
     "reset.css": "^2.0.2",
     "sequelize": "^6.32.1",
+    "sloc": "^0.2.1",
     "smtp-server": "^3.13.0",
     "swagger-ui-express": "^5.0.0",
     "validator": "^13.11.0",
