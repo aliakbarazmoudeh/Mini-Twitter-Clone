@@ -52,7 +52,7 @@ app.get('/', (req, res) => {
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tweets', tweetRouter);
-app.use('/api/v1/book-marks',bookMarkRouter)
+app.use('/api/v1/book-marks', bookMarkRouter);
 
 // not found and errors handler
 const errorHanlder = require('./middleware/error-handler');
@@ -67,6 +67,7 @@ const { QueryInterface } = require('sequelize');
 const Tweet = require('./models/Tweet');
 const Following = require('./models/following');
 const BookMark = require('./models/BookMark');
+const Like = require('./models/Like');
 const start = async () => {
   try {
     await connectDB.sync();
@@ -74,6 +75,7 @@ const start = async () => {
     // await BookMark.sync({ alter: true });
     // await Tweet.sync({ alter: true });
     // await Following.sync({ alter: true });
+    // await Like.sync({ alter: true });
     console.log('connected to Database ...');
     app.listen(PORT, () =>
       console.log(`Server is listening on port ${PORT}...`)

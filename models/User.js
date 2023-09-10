@@ -4,6 +4,7 @@ const { hashSync } = require('bcryptjs');
 const Tweet = require('./Tweet');
 const Following = require('./following');
 const BookMark = require('./BookMark');
+const Like = require('../models/Like');
 
 const User = sequelize.define('User', {
   id: {
@@ -61,6 +62,7 @@ const User = sequelize.define('User', {
 });
 
 User.hasMany(Tweet, { foreignKey: 'UserId' });
+User.hasMany(Like, { foreignKey: 'UserId' });
 User.hasMany(Following, { foreignKey: 'Follower' });
 Following.belongsTo(User, {
   as: 'followings',

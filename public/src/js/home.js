@@ -46,23 +46,33 @@ const displayTweets = async () => {
     const tweetId =
       likeBtn.parentElement.parentElement.parentElement.dataset.id;
     // console.log(likeBtn);
-    likeBtn.addEventListener('click', () => like(tweetId, '+'));
+    likeBtn.addEventListener('click', () => like(tweetId));
   });
 };
 
-const like = async (id, symbol) => {
-  const tweet = await fetch(`/api/v1/tweets/${id}`);
-  let { numOfLikes } = await tweet.json();
-  const Body = { numOfLikes: numOfLikes + 1 };
-  const response = await fetch(`/api/v1/tweets/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(Body),
+const like = async (id) => {
+  // const tweet = await fetch(`/api/v1/tweets/${id}`);
+  // let { numOfLikes } = await tweet.json();
+  // const Body = { numOfLikes: numOfLikes + 1 };
+  let isLiked = await fetch('/api/v1/tweets/likes', {
+    method: 'POST',
+    body: JSON.stringify({ tweetId: null }),
     headers: {
       'Content-Type': 'application/json',
     },
   });
-  const result = await response.json();
-  console.log(result);
+  isLiked = await isLiked.json();
+  console.log(isLiked);
+  // const response = await fetch(`/api/v1/tweets/like/${id}`)
+  //   .then((tweet) => {
+  //     console.log('nice too meet you im the okey');
+  //   })
+  //   .catch((err) => {
+  //     console.log('nice to meet u im the bug');
+  //   });
+  // console.log(response);
+  // const result = await response.json();
+  // console.log(result);
   // location.reload();
 };
 displayTweets();

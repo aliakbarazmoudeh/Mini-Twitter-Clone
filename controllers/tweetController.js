@@ -4,6 +4,7 @@ const Tweet = require('../models/Tweet');
 const User = require('../models/User');
 const checkPermission = require('../utils/checkPermission');
 const createdDate = require('../utils/date');
+const Like = require('../models/Like');
 
 const getSingleTweet = async (req, res) => {
   const tweet = await Tweet.findByPk(req.params.id, {
@@ -41,11 +42,14 @@ const createTweet = async (req, res) => {
 };
 
 const updateTweet = async (req, res) => {
+  console.log(req.user);
   const tweet = await Tweet.findByPk(req.params.id);
+  // const isLiked = await
   if (!tweet)
     throw new customError.NotFoundError(
       `cant find any tweet with this ID : ${req.params.id}`
     );
+
   const { text } = req.body;
   if (text) checkPermission(req.user, tweet.UserId);
   tweet.set(req.body);
@@ -64,10 +68,38 @@ const deleteTweet = async (req, res) => {
   res.status(StatusCodes.OK).json({ successful: true });
 };
 
+const likeTweet = async (req, res) => {
+  const { id } = req.params;
+  const likedTweet = await Like.create({
+    tweetId: id,
+    UserId: req.user.UserId,
+  });
+  console.log('object');
+  res.json(likedTweet);
+};
+
+const disLikeTweet = async (req, res) => {
+  res.json({ msg: 'bye' });
+};
+
+const getAllLikedTweet = async (req, res) => {
+  let { tweetId } = req.body;
+  let whereBody = { UserId: req.user.UserId };
+  tweetId ? (whereBody['tweetId'] = tweetId) : null;
+  console.log(whereBody);
+  const LikedTweet = await Like.findAll({
+    where: whereBody,
+  });
+  res.status(StatusCodes.OK).json(LikedTweet);
+};
+
 module.exports = {
   getAllTweets,
   getSingleTweet,
   updateTweet,
   createTweet,
   deleteTweet,
+  getAllLikedTweet,
+  likeTweet,
+  disLikeTweet,
 };
