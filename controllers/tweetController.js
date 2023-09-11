@@ -5,6 +5,8 @@ const User = require('../models/User');
 const checkPermission = require('../utils/checkPermission');
 const createdDate = require('../utils/date');
 const Like = require('../models/Like');
+const { where } = require('sequelize');
+const sequelize = require('../db/connectDB');
 
 const getSingleTweet = async (req, res) => {
   const tweet = await Tweet.findByPk(req.params.id, {
@@ -74,19 +76,31 @@ const likeTweet = async (req, res) => {
     tweetId: id,
     UserId: req.user.UserId,
   });
-  console.log('object');
-  res.json(likedTweet);
+  const tweet = await Tweet.findOne({ where: { id } });
+  tweet.setNumOfLike('+');
+  tweet.save();
+  res.json({ successful: true });
 };
 
 const disLikeTweet = async (req, res) => {
-  res.json({ msg: 'bye' });
+  const { id } = req.params;
+
+  const likedTweet = await Like.destroy({
+    where: {
+      tweetId: id,
+      UserId: req.user.UserId,
+    },
+  });
+  const tweet = await Tweet.findOne({ where: { id } });
+  tweet.setNumOfLike('-');
+  tweet.save();
+  res.json({ successful: true });
 };
 
 const getAllLikedTweet = async (req, res) => {
   let { tweetId } = req.body;
   let whereBody = { UserId: req.user.UserId };
   tweetId ? (whereBody['tweetId'] = tweetId) : null;
-  console.log(whereBody);
   const LikedTweet = await Like.findAll({
     where: whereBody,
   });

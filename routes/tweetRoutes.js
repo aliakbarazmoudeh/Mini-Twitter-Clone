@@ -15,6 +15,6 @@ router.use(authenticateUser);
 router.route('/').get(getAllTweets).post(createTweet);
 router.route('/likes').post(getAllLikedTweet);
 router.route('/:id').get(getSingleTweet).patch(updateTweet).delete(deleteTweet);
-router.route('/like/:id').get(likeTweet).delete(disLikeTweet);
+router.route('/like/:id').post(likeTweet).delete(disLikeTweet);
 
 module.exports = router;

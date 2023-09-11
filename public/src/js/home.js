@@ -1,10 +1,15 @@
 const tweetsContainer = document.querySelector('section');
 
 const displayTweets = async () => {
-  const response = await fetch('/api/v1/tweets');
-  const tweets = await response.json();
+  let tweets = await fetch('/api/v1/tweets');
+  tweets = await tweets.json();
+  let likes = await fetch('/api/v1/tweets/likes', {
+    method: 'POST',
+  });
+  likes = await likes.json();
   tweetsContainer.innerHTML = tweets
     .map(({ id, text, User: user, created, numOfLikes }) => {
+      let liked = likes.find((tweet) => tweet.tweetId === id);
       return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
@@ -23,8 +28,8 @@ const displayTweets = async () => {
       width='20'
       height='20'
       viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
+      fill=${liked ? 'red' : 'none'}
+      stroke=${liked ? 'none' : 'black'}
       stroke-width='2'
       stroke-linecap='round'
       stroke-linejoin='round'
@@ -41,39 +46,46 @@ const displayTweets = async () => {
     })
     .join(' ');
   const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
-  // console.log(likeBtn);
   likeBtns.forEach((likeBtn) => {
     const tweetId =
       likeBtn.parentElement.parentElement.parentElement.dataset.id;
-    // console.log(likeBtn);
     likeBtn.addEventListener('click', () => like(tweetId));
   });
 };
 
 const like = async (id) => {
-  // const tweet = await fetch(`/api/v1/tweets/${id}`);
-  // let { numOfLikes } = await tweet.json();
-  // const Body = { numOfLikes: numOfLikes + 1 };
   let isLiked = await fetch('/api/v1/tweets/likes', {
     method: 'POST',
-    body: JSON.stringify({ tweetId: null }),
+    body: JSON.stringify({ tweetId: id }),
     headers: {
       'Content-Type': 'application/json',
     },
   });
   isLiked = await isLiked.json();
   console.log(isLiked);
-  // const response = await fetch(`/api/v1/tweets/like/${id}`)
-  //   .then((tweet) => {
-  //     console.log('nice too meet you im the okey');
-  //   })
-  //   .catch((err) => {
-  //     console.log('nice to meet u im the bug');
-  //   });
-  // console.log(response);
-  // const result = await response.json();
-  // console.log(result);
-  // location.reload();
+  if (isLiked.length === 0) {
+    const response = await fetch(`/api/v1/tweets/like/${id}`, {
+      method: 'POST',
+      body: JSON.stringify({ tweetId: id }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const result = await response.json();
+    console.log(result);
+    location.reload();
+  } else {
+    const response = await fetch(`/api/v1/tweets/like/${id}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ tweetId: id }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const result = await response.json();
+    console.log(result);
+    location.reload();
+  }
 };
 displayTweets();
 

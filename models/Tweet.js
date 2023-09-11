@@ -33,4 +33,8 @@ const Tweet = sequelize.define(
   { timestamps: true, updatedAt: true, createdAt: true }
 );
 
+Tweet.prototype.setNumOfLike = function (symbol) {
+  symbol === '+' ? (this.numOfLikes += 1) : (this.numOfLikes -= 1);
+};
+
 module.exports = Tweet;
