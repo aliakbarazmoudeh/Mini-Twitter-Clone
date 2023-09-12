@@ -2,6 +2,7 @@ const tweetsContainer = document.querySelector('section');
 
 const displayTweets = async () => {
   let tweets = await fetch('/api/v1/tweets');
+  tweets.status === 401 ? window.location.replace('/') : null;
   tweets = await tweets.json();
   let likes = await fetch('/api/v1/tweets/likes', {
     method: 'POST',
@@ -13,6 +14,7 @@ const displayTweets = async () => {
       return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
+          <img src="./src/profiles/default_profile.png" alt="" class="avator">
           <div class="tweet-header-info">
             ${user.name}<span>@${user.username}</span><span>. ${created}
             </span>
