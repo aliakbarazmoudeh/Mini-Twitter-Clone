@@ -5,8 +5,6 @@ const User = require('../models/User');
 const checkPermission = require('../utils/checkPermission');
 const createdDate = require('../utils/date');
 const Like = require('../models/Like');
-const { where } = require('sequelize');
-const sequelize = require('../db/connectDB');
 
 const getSingleTweet = async (req, res) => {
   const tweet = await Tweet.findByPk(req.params.id, {
@@ -28,7 +26,7 @@ const getAllTweets = async (req, res) => {
   const tweets = await Tweet.findAll({
     include: {
       model: User,
-      attributes: ['name', 'username'],
+      attributes: ['name', 'username', 'profile', 'official'],
     },
     order: [['createdAt', 'desc']],
   });
@@ -46,7 +44,6 @@ const createTweet = async (req, res) => {
 const updateTweet = async (req, res) => {
   console.log(req.user);
   const tweet = await Tweet.findByPk(req.params.id);
-  // const isLiked = await
   if (!tweet)
     throw new customError.NotFoundError(
       `cant find any tweet with this ID : ${req.params.id}`

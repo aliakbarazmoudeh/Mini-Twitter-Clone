@@ -29,6 +29,19 @@ const User = sequelize.define('User', {
       notEmpty: true,
     },
   },
+  profile: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  biography: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  official: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,

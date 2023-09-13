@@ -72,7 +72,7 @@ const Like = require('./models/Like');
 const start = async () => {
   try {
     await connectDB.sync();
-    // await User.sync({ alter: false, force: false });
+    // await User.sync({ alter: true });
     // await BookMark.sync({ alter: true });
     // await Tweet.sync({ alter: true });
     // await Following.sync({ alter: true });

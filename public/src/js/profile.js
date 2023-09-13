@@ -7,7 +7,8 @@ const nameDOM = document.querySelector('.profile h1'),
   followerDOM = document.querySelector('.followers-count'),
   bookMarkDOM = document.querySelector('.book-mark-count'),
   navBtnDOM = document.querySelectorAll('.container ul li'),
-  ContainerTitle = document.querySelector('nav a');
+  ContainerTitle = document.querySelector('nav a'),
+  profilePic = document.querySelector('.avatar');
 
 let userInfo, Followers;
 
@@ -86,14 +87,16 @@ const activateNavBtns = async () => {
 const fetchCurrentUser = async () => {
   const response = await fetch(`/api/v1/users`);
   const { user: currentUser, Followers: followers } = await response.json();
+  console.log(currentUser);
   const { Tweets, Followings, BookMarks } = currentUser;
   userInfo = currentUser;
   Followers = followers;
   numOfTweets.textContent = Tweets.length;
   nameDOM.textContent = currentUser.name;
+  profilePic.src = currentUser.profile;
   usernameDOM.textContent = currentUser.username;
-  currentUser.bio
-    ? (bioDOM.textContent = currentUser.bio)
+  currentUser.biography
+    ? (bioDOM.textContent = currentUser.biography)
     : (bioDOM.textContent = 'Bio');
   Followings
     ? (followingDOM.textContent = Followings.length)

@@ -1,5 +1,6 @@
 const tweetBtn = document.querySelector('.tweet-btn');
 const tweetText = document.querySelector('.tweet_box-input input');
+
 tweetBtn.addEventListener('click', async (e) => {
   e.preventDefault();
   const Body = { text: tweetText.value };

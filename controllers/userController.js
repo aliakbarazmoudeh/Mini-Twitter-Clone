@@ -7,6 +7,7 @@ const Tweet = require('../models/Tweet');
 const sendVerificationLink = require('../utils/verify');
 const Following = require('../models/following');
 const BookMark = require('../models/BookMark');
+const path = require('path');
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -79,7 +80,15 @@ const showCurrenUsre = async (req, res) => {
       },
     ],
     order: [[{ model: Tweet }, 'updatedAt', 'desc']],
-    attributes: ['id', 'name', 'username', 'email'],
+    attributes: [
+      'id',
+      'name',
+      'username',
+      'email',
+      'profile',
+      'biography',
+      'official',
+    ],
   });
   const Followers = await Following.findAll({
     where: { following: req.user.UserId },
@@ -91,6 +100,40 @@ const showCurrenUsre = async (req, res) => {
     },
   });
   res.status(StatusCodes.OK).json({ user, Followers });
+};
+
+const updateUser = async (req, res) => {
+  const { image } = req.files;
+  // const src = image
+  //   ? await uploadProductImageLocal(image)
+  //   : './src/profiles/default_profile.png';
+  const user = await User.findByPk(req.user.UserId, {
+    attributes: ['name', 'username'],
+  });
+  res.json({ image });
+};
+
+const updateProfileUser = async (req, res) => {
+  if (!req.files) {
+    throw new CustomError.BadRequestError('No File Uploaded');
+  }
+  const productImage = req.files.image;
+  if (!productImage.mimetype.startsWith('image')) {
+    throw new CustomError.BadRequestError('Please Upload Image');
+  }
+  const maxSize = 1024 * 512;
+  if (productImage.size > maxSize) {
+    throw new CustomError.BadRequestError('Please upload image smaller 0.5MB');
+  }
+  const imagePath = path.join(
+    __dirname,
+    '../public/src/profiles/' + `${productImage.name}`
+  );
+  // await productImage.mv(imagePath);
+  const user = await User.findByPk(req.user.UserId);
+  user.profile = `./src/profiles/${productImage.name}`;
+  user.save();
+  res.json({ user });
 };
 
 const getSingleUser = async (req, res) => {
@@ -123,4 +166,6 @@ module.exports = {
   showCurrenUsre,
   verifyEmail,
   follow,
+  updateUser,
+  updateProfileUser,
 };

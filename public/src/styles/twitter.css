@@ -31,9 +31,23 @@ img {
   align-items: flex-start;
   font-size: 14px;
 }
+
+.tweet-header img {
+  height: 50px;
+  width: 50px;
+  object-fit: cover;
+}
+
+.blue-check {
+  width: 21px !important;
+  height: 21px !important;
+  object-fit: cover;
+}
+
 .tweet-header-info {
   font-weight: bold;
 }
+
 .tweet-header-info span {
   color: #657786;
   font-weight: normal;
@@ -202,7 +216,9 @@ a {
 
 .tweet_box-input img {
   border-radius: 50%;
-  height: 40px;
+  height: 50px;
+  object-fit: cover;
+  width: 50px;
 }
 
 .tweet_box {
@@ -237,7 +253,7 @@ a {
   border: none;
   width: 80px;
   height: 40px;
-  margin-top: 20px;
+  /* margin-top: 20px; */
   margin-left: auto;
 }
 

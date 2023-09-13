@@ -1,4 +1,13 @@
 const tweetsContainer = document.querySelector('section');
+const profilePic = document.querySelector('.profil-picture');
+
+const tweetBox = async () => {
+  let data = await fetch('/api/v1/users');
+  let { user } = await data.json();
+  profilePic.src = user.profile;
+};
+
+tweetBox();
 
 const displayTweets = async () => {
   let tweets = await fetch('/api/v1/tweets');
@@ -14,14 +23,24 @@ const displayTweets = async () => {
       return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
-          <img src="./src/profiles/default_profile.png" alt="" class="avator">
+          <img src=${
+            user.profile ? user.profile : './src/profiles/default_profile.png'
+          } alt="" class="avator">
           <div class="tweet-header-info">
-            ${user.name}<span>@${user.username}</span><span>. ${created}
+        
+            ${user.name}
+            ${
+              user.official
+                ? "<img class='blue-check' src='./src/images/Check Mark Badge.png' alt=''></img>"
+                : ''
+            }
+            <span>@${user.username}</span>
+            <span>. ${created}
             </span>
-            <p>${text}</p>
-          </div>
-          
-        </div>
+            <p class="test">${text}</p>
+            </div>
+            
+            </div>
         <div class="tweet-info-counts">
           <div class='likes'>
     <svg
