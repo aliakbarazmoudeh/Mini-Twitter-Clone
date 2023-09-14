@@ -6,15 +6,14 @@ const express = require('express');
 const app = express();
 const connectDB = require('./db/connectDB');
 const PORT = process.env.PORT || 5000;
+const http = require('http');
+const server = http.createServer(app);
+var io = require('socket.io');
+
+// const socketController = require('./socket')(io);
 
 // SMTP server
 const SMTPServer = require('smtp-server').SMTPServer;
-// const email = new
-
-// swagger
-const swaggerUI = require('swagger-ui-express');
-const YAML = require('yamljs');
-const swaggerDocument = YAML.load('./swagger.yaml');
 
 // rest packages
 const path = require('path');
@@ -46,11 +45,20 @@ const userRouter = require('./routes/userRoutes');
 const tweetRouter = require('./routes/tweetRoutes');
 const bookMarkRouter = require('./routes/bookMarkRoutes');
 
+io = io(server);
+app.use(function (req, res, next) {
+  req.io = io;
+  next();
+});
+
+io.on('connection', function (socket) {
+  // console.log('socket.io connection made');
+});
+
 app.use(express.static(path.resolve(__dirname, './public')));
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './public', 'login.html'));
 });
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tweets', tweetRouter);
 app.use('/api/v1/book-marks', bookMarkRouter);
@@ -69,18 +77,19 @@ const Tweet = require('./models/Tweet');
 const Following = require('./models/following');
 const BookMark = require('./models/BookMark');
 const Like = require('./models/Like');
+
 const start = async () => {
   try {
-    await connectDB.sync();
+    await connectDB.authenticate();
     // await User.sync({ alter: true });
     // await BookMark.sync({ alter: true });
     // await Tweet.sync({ alter: true });
     // await Following.sync({ alter: true });
     // await Like.sync({ alter: true });
     console.log('connected to Database ...');
-    app.listen(PORT, () =>
-      console.log(`Server is listening on port ${PORT}...`)
-    );
+    server.listen(PORT, () => {
+      console.log(`App is listening on port ${PORT}`);
+    });
   } catch (error) {
     console.log(error);
   }

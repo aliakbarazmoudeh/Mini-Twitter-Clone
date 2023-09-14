@@ -30,6 +30,8 @@
     "sequelize": "^6.32.1",
     "sloc": "^0.2.1",
     "smtp-server": "^3.13.0",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
     "swagger-ui-express": "^5.0.0",
     "validator": "^13.11.0",
     "xss-clean": "^0.1.1",

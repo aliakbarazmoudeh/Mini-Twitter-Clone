@@ -1,25 +1,13 @@
 const tweetsContainer = document.querySelector('section');
 const profilePic = document.querySelector('.profil-picture');
 
-const tweetBox = async () => {
-  let data = await fetch('/api/v1/users');
-  let { user } = await data.json();
-  profilePic.src = user.profile;
-};
+const socket = io();
 
-tweetBox();
-
-const displayTweets = async () => {
-  let tweets = await fetch('/api/v1/tweets');
-  tweets.status === 401 ? window.location.replace('/') : null;
-  tweets = await tweets.json();
-  let likes = await fetch('/api/v1/tweets/likes', {
-    method: 'POST',
-  });
-  likes = await likes.json();
+socket.on('temp', ({ tweets }) => {
+  console.log(tweets);
   tweetsContainer.innerHTML = tweets
     .map(({ id, text, User: user, created, numOfLikes }) => {
-      let liked = likes.find((tweet) => tweet.tweetId === id);
+      let liked = null;
       return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
@@ -66,12 +54,34 @@ const displayTweets = async () => {
     `;
     })
     .join(' ');
-  const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
-  likeBtns.forEach((likeBtn) => {
-    const tweetId =
-      likeBtn.parentElement.parentElement.parentElement.dataset.id;
-    likeBtn.addEventListener('click', () => like(tweetId));
+});
+
+// const socket = window.io();
+
+// Socket
+
+const tweetBox = async () => {
+  let data = await fetch('/api/v1/users');
+  let { user } = await data.json();
+  profilePic.src = user.profile;
+};
+
+tweetBox();
+
+const displayTweets = async () => {
+  let tweets = await fetch('/api/v1/tweets');
+  tweets.status === 401 ? window.location.replace('/') : null;
+  tweets = await tweets.json();
+  let likes = await fetch('/api/v1/tweets/likes', {
+    method: 'POST',
   });
+  likes = await likes.json();
+  // const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
+  // likeBtns.forEach((likeBtn) => {
+  //   const tweetId =
+  //     likeBtn.parentElement.parentElement.parentElement.dataset.id;
+  //   likeBtn.addEventListener('click', () => like(tweetId));
+  // });
 };
 
 const like = async (id) => {
