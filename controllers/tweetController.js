@@ -5,8 +5,6 @@ const User = require('../models/User');
 const checkPermission = require('../utils/checkPermission');
 const createdDate = require('../utils/date');
 const Like = require('../models/Like');
-// const {} = require('socket.io');
-// const io = require('../app');
 
 const getSingleTweet = async (req, res) => {
   const tweet = await Tweet.findByPk(req.params.id, {
@@ -32,10 +30,8 @@ const getAllTweets = async (req, res) => {
     },
     order: [['createdAt', 'desc']],
   });
-  // console.log(req.io);
-  console.log(req.io.emit('temp', { tweets }));
-  // req.io.emit('some_event', { msg: 'test github' });
-  res.status(StatusCodes.OK).json(tweets);
+  req.io.emiter('tweets', { tweets });
+  res.status(StatusCodes.OK);
 };
 
 const createTweet = async (req, res) => {
@@ -106,6 +102,8 @@ const getAllLikedTweet = async (req, res) => {
   const LikedTweet = await Like.findAll({
     where: whereBody,
   });
+  req.io.emiter('liked', { LikedTweet });
+  // console.log('i have emited');
   res.status(StatusCodes.OK).json(LikedTweet);
 };
 

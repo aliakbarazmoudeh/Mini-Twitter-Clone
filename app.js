@@ -45,20 +45,26 @@ const userRouter = require('./routes/userRoutes');
 const tweetRouter = require('./routes/tweetRoutes');
 const bookMarkRouter = require('./routes/bookMarkRoutes');
 
-io = io(server);
+app.use(express.static(path.resolve(__dirname, './public')));
+app.get('/', (req, res) => {
+  res.sendFile(path.resolve(__dirname, './public', 'login.html'));
+});
+
+// io = io(server);
+const SocketService = require('./socket');
+
+var io = new SocketService(server);
 app.use(function (req, res, next) {
   req.io = io;
   next();
 });
 
-io.on('connection', function (socket) {
-  // console.log('socket.io connection made');
-});
+// io.on('connection', function (socket) {
+//   console.log(socket.id);
+//   console.log('user connected');
+//   // console.log('socket.io connection made');
+// });
 
-app.use(express.static(path.resolve(__dirname, './public')));
-app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, './public', 'login.html'));
-});
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tweets', tweetRouter);
 app.use('/api/v1/book-marks', bookMarkRouter);
@@ -80,7 +86,7 @@ const Like = require('./models/Like');
 
 const start = async () => {
   try {
-    await connectDB.authenticate();
+    await connectDB.sync();
     // await User.sync({ alter: true });
     // await BookMark.sync({ alter: true });
     // await Tweet.sync({ alter: true });

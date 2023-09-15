@@ -1,14 +1,36 @@
 const tweetsContainer = document.querySelector('section');
 const profilePic = document.querySelector('.profil-picture');
-
 const socket = io();
 
-socket.on('temp', ({ tweets }) => {
-  console.log(tweets);
-  tweetsContainer.innerHTML = tweets
-    .map(({ id, text, User: user, created, numOfLikes }) => {
-      let liked = null;
-      return `
+const tweetBox = async () => {
+  let data = await fetch('/api/v1/users');
+  let { user } = await data.json();
+  profilePic.src = user.profile;
+};
+
+tweetBox();
+
+const displayTweets = async () => {
+  // let likes = await fetch('/api/v1/tweets/likes', {
+  //   method: 'POST',
+  // });
+  // likes = await likes.json();
+  // const isliked = (id) => {
+  //   return likes.find((tweet) => tweet.tweetId === id);
+  // };
+  // console.log(likes, 'im the like number');
+
+  socket.on('tweets', async ({ tweets }) => {
+    let likes = await fetch('/api/v1/tweets/likes', {
+      method: 'POST',
+    });
+    likes = await likes.json();
+    tweetsContainer.innerHTML = '';
+    tweetsContainer.innerHTML = tweets
+      .map(({ id, text, User: user, created, numOfLikes }) => {
+        let liked = likes.find((tweet) => tweet.tweetId === id);
+
+        return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
           <img src=${
@@ -52,39 +74,23 @@ socket.on('temp', ({ tweets }) => {
       </div>
       
     `;
-    })
-    .join(' ');
-});
-
-// const socket = window.io();
-
-// Socket
-
-const tweetBox = async () => {
-  let data = await fetch('/api/v1/users');
-  let { user } = await data.json();
-  profilePic.src = user.profile;
-};
-
-tweetBox();
-
-const displayTweets = async () => {
-  let tweets = await fetch('/api/v1/tweets');
-  tweets.status === 401 ? window.location.replace('/') : null;
-  tweets = await tweets.json();
-  let likes = await fetch('/api/v1/tweets/likes', {
-    method: 'POST',
+      })
+      .join(' ');
+    const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
+    likeBtns.forEach((likeBtn) => {
+      const tweetId =
+        likeBtn.parentElement.parentElement.parentElement.dataset.id;
+      likeBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await like(tweetId);
+        console.log('now i have to update');
+      });
+    });
   });
-  likes = await likes.json();
-  // const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
-  // likeBtns.forEach((likeBtn) => {
-  //   const tweetId =
-  //     likeBtn.parentElement.parentElement.parentElement.dataset.id;
-  //   likeBtn.addEventListener('click', () => like(tweetId));
-  // });
 };
 
 const like = async (id) => {
+  console.log('nice');
   let isLiked = await fetch('/api/v1/tweets/likes', {
     method: 'POST',
     body: JSON.stringify({ tweetId: id }),
@@ -92,6 +98,9 @@ const like = async (id) => {
       'Content-Type': 'application/json',
     },
   });
+  // socket.on('liked', (liked) => {
+  //   console.log(liked);
+  // });
   isLiked = await isLiked.json();
   console.log(isLiked);
   if (isLiked.length === 0) {
@@ -102,9 +111,6 @@ const like = async (id) => {
         'Content-Type': 'application/json',
       },
     });
-    const result = await response.json();
-    console.log(result);
-    location.reload();
   } else {
     const response = await fetch(`/api/v1/tweets/like/${id}`, {
       method: 'DELETE',
@@ -113,12 +119,17 @@ const like = async (id) => {
         'Content-Type': 'application/json',
       },
     });
-    const result = await response.json();
-    console.log(result);
-    location.reload();
   }
+  location.reload();
 };
+
 displayTweets();
+
+window.addEventListener('load', async () => {
+  let tweets = await fetch('/api/v1/tweets');
+  tweets.status === 401 ? window.location.replace('/') : null;
+  displayTweets();
+});
 
 {
   /* <div class='tweet-info-counts'>
