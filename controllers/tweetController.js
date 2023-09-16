@@ -30,6 +30,9 @@ const getAllTweets = async (req, res) => {
     },
     order: [['createdAt', 'desc']],
   });
+  let { tweetId } = req.body;
+  const LikedTweet = await Like.findAll();
+  req.io.emiter('liked', { LikedTweet });
   req.io.emiter('tweets', { tweets });
   res.status(StatusCodes.OK);
 };
@@ -102,8 +105,6 @@ const getAllLikedTweet = async (req, res) => {
   const LikedTweet = await Like.findAll({
     where: whereBody,
   });
-  req.io.emiter('liked', { LikedTweet });
-  // console.log('i have emited');
   res.status(StatusCodes.OK).json(LikedTweet);
 };
 

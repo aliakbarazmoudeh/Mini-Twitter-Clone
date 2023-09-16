@@ -350,3 +350,13 @@ aside {
   font-size: 18px;
   font-weight: 800;
 }
+
+.alreadyLiked {
+  fill: red;
+  stroke: none;
+}
+
+.notLiked {
+  fill: none;
+  stroke: black;
+}

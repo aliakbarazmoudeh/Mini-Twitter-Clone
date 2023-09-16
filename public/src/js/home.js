@@ -11,15 +11,6 @@ const tweetBox = async () => {
 tweetBox();
 
 const displayTweets = async () => {
-  // let likes = await fetch('/api/v1/tweets/likes', {
-  //   method: 'POST',
-  // });
-  // likes = await likes.json();
-  // const isliked = (id) => {
-  //   return likes.find((tweet) => tweet.tweetId === id);
-  // };
-  // console.log(likes, 'im the like number');
-
   socket.on('tweets', async ({ tweets }) => {
     let likes = await fetch('/api/v1/tweets/likes', {
       method: 'POST',
@@ -54,7 +45,9 @@ const displayTweets = async () => {
         <div class="tweet-info-counts">
           <div class='likes'>
     <svg
-      class='feather feather-heart sc-dnqmqq jxshSx'
+      class='feather feather-heart sc-dnqmqq jxshSx ${
+        liked ? 'alreadyLiked' : 'notLiked'
+      }'
       xmlns='http://www.w3.org/2000/svg'
       width='20'
       height='20'
@@ -82,15 +75,29 @@ const displayTweets = async () => {
         likeBtn.parentElement.parentElement.parentElement.dataset.id;
       likeBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        await like(tweetId);
-        console.log('now i have to update');
+        let likeSVG;
+        e.target.classList.length === 0
+          ? (likeSVG = e.target.parentElement)
+          : (likeSVG = e.target);
+        let status = likeSVG.classList.contains('alreadyLiked');
+        let countDOM = likeSVG.nextSibling.nextSibling;
+        let countNum = Number(likeSVG.nextSibling.nextSibling.textContent);
+        if (status) {
+          likeSVG.classList.remove('alreadyLiked');
+          likeSVG.classList.add('notLiked');
+          countDOM.textContent = countNum - 1;
+        } else {
+          likeSVG.classList.remove('notLiked');
+          likeSVG.classList.add('alreadyLiked');
+          countDOM.textContent = countNum + 1;
+        }
+        like(tweetId);
       });
     });
   });
 };
 
 const like = async (id) => {
-  console.log('nice');
   let isLiked = await fetch('/api/v1/tweets/likes', {
     method: 'POST',
     body: JSON.stringify({ tweetId: id }),
@@ -98,11 +105,7 @@ const like = async (id) => {
       'Content-Type': 'application/json',
     },
   });
-  // socket.on('liked', (liked) => {
-  //   console.log(liked);
-  // });
   isLiked = await isLiked.json();
-  console.log(isLiked);
   if (isLiked.length === 0) {
     const response = await fetch(`/api/v1/tweets/like/${id}`, {
       method: 'POST',
@@ -120,7 +123,6 @@ const like = async (id) => {
       },
     });
   }
-  location.reload();
 };
 
 displayTweets();

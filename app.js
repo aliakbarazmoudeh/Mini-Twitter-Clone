@@ -8,9 +8,9 @@ const connectDB = require('./db/connectDB');
 const PORT = process.env.PORT || 5000;
 const http = require('http');
 const server = http.createServer(app);
+const IP = require('ip');
 var io = require('socket.io');
 
-// const socketController = require('./socket')(io);
 
 // SMTP server
 const SMTPServer = require('smtp-server').SMTPServer;
@@ -26,13 +26,13 @@ const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 
 // use packages
-// app.set('trust proxy', 1);
-// app.use(
-//   rateLimiter({
-//     windowMs: 15 * 60 * 1000,
-//     max: 60,
-//   })
-// );
+app.set('trust proxy', 1);
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 60,
+  })
+);
 app.use(express.json());
 app.use(fileUpload());
 app.use(helmet());
@@ -45,25 +45,18 @@ const userRouter = require('./routes/userRoutes');
 const tweetRouter = require('./routes/tweetRoutes');
 const bookMarkRouter = require('./routes/bookMarkRoutes');
 
+const dns = require('dns');
 app.use(express.static(path.resolve(__dirname, './public')));
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './public', 'login.html'));
 });
 
-// io = io(server);
 const SocketService = require('./socket');
-
 var io = new SocketService(server);
 app.use(function (req, res, next) {
   req.io = io;
   next();
 });
-
-// io.on('connection', function (socket) {
-//   console.log(socket.id);
-//   console.log('user connected');
-//   // console.log('socket.io connection made');
-// });
 
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/tweets', tweetRouter);
@@ -78,7 +71,6 @@ app.use(notFoundHanlder);
 
 // starting app
 const User = require('./models/User');
-const { QueryInterface } = require('sequelize');
 const Tweet = require('./models/Tweet');
 const Following = require('./models/following');
 const BookMark = require('./models/BookMark');
