@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <link rel="stylesheet" type="text/css" href="./src/styles/profile.css" />
+ <link rel="website icon" type="png" href="./src/images/twitter-icon.png" />
+ <title>Profile / Twitter</title>
+
+</head>
+
+<body>
+
+ <div class="bar">
+  <div class="container">
+   <ul>
+    <li class="active" data-id="Tweets">
+     <span>Tweets</span>
+     <strong class="tweets-count"></strong>
+    </li>
+
+    <li data-id="Followings">
+     <span>Followings</span>
+     <strong class="followings-count"></strong>
+    </li>
+
+    <li data-id="Followers">
+     <span>Followers</span>
+     <strong class="followers-count"></strong>
+    </li>
+   </ul>
+
+
+  </div>
+ </div>
+
+ <div class="wrapper-content">
+  <div class="container">
+   <aside class="profile">
+    <img class="avatar" src="" alt="">
+    <h1></h1>
+    <span></span>
+    <p></p>
+   </aside>
+   <section class="timeline">
+    <nav>
+     <a href="" class="active">Tweets</a>
+    </nav>
+    <ul class="tweets">
+     <li>
+      <div class="info">
+       <strong><span></span></strong>
+       <p></p>
+       <div class="actions">
+        <a href=""><img src="./src/images/comments.svg" alt="Comments"> 3</a>
+        <a href=""><img src="./src/images/retweet.svg" alt="Retweet"> 8</a>
+        <a href=""><img src="./src/images/like.svg" alt="Like"> 3</a>
+       </div>
+      </div>
+     </li>
+    </ul>
+   </section>
+  </div>
+ </div>
+ <script type="module" src="./src/js/user.js"></script>
+</body>
+
+</html>

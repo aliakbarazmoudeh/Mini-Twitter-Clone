@@ -104,9 +104,6 @@ const showCurrenUsre = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { image } = req.files;
-  // const src = image
-  //   ? await uploadProductImageLocal(image)
-  //   : './src/profiles/default_profile.png';
   const user = await User.findByPk(req.user.UserId, {
     attributes: ['name', 'username'],
   });
@@ -129,7 +126,6 @@ const updateProfileUser = async (req, res) => {
     __dirname,
     '../public/src/profiles/' + `${productImage.name}`
   );
-  // await productImage.mv(imagePath);
   const user = await User.findByPk(req.user.UserId);
   user.profile = `./src/profiles/${productImage.name}`;
   user.save();
@@ -148,7 +144,7 @@ const getSingleUser = async (req, res) => {
     throw new customError.NotFoundError(
       `cant find any user with this User ID : ${UserId}`
     );
-  res.status(StatusCodes.OK).json(user);
+  res.redirect('http://localhost:5000/user.html');
 };
 
 const follow = async (req, res) => {

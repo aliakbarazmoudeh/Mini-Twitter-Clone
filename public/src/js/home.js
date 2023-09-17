@@ -2,6 +2,12 @@ const tweetsContainer = document.querySelector('section');
 const profilePic = document.querySelector('.profil-picture');
 const socket = io();
 
+window.addEventListener('load', async () => {
+  let tweets = await fetch('/api/v1/tweets');
+  tweets.status === 401 ? window.location.replace('/') : null;
+  displayTweets();
+});
+
 const tweetBox = async () => {
   let data = await fetch('/api/v1/users');
   let { user } = await data.json();
@@ -26,7 +32,7 @@ const displayTweets = async () => {
         <div class="tweet-header">
           <img src=${
             user.profile ? user.profile : './src/profiles/default_profile.png'
-          } alt="" class="avator">
+          } alt="" class="avator" data-id=${user.id}>
           <div class="tweet-header-info">
         
             ${user.name}
@@ -70,31 +76,52 @@ const displayTweets = async () => {
       })
       .join(' ');
     const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
+    const avators = tweetsContainer.querySelectorAll('.avator');
+    avators.forEach((avator) => {
+      avator.addEventListener('click', (e) => {
+        showUserInfo(e);
+      });
+    });
     likeBtns.forEach((likeBtn) => {
       const tweetId =
         likeBtn.parentElement.parentElement.parentElement.dataset.id;
       likeBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        let likeSVG;
-        e.target.classList.length === 0
-          ? (likeSVG = e.target.parentElement)
-          : (likeSVG = e.target);
-        let status = likeSVG.classList.contains('alreadyLiked');
-        let countDOM = likeSVG.nextSibling.nextSibling;
-        let countNum = Number(likeSVG.nextSibling.nextSibling.textContent);
-        if (status) {
-          likeSVG.classList.remove('alreadyLiked');
-          likeSVG.classList.add('notLiked');
-          countDOM.textContent = countNum - 1;
-        } else {
-          likeSVG.classList.remove('notLiked');
-          likeSVG.classList.add('alreadyLiked');
-          countDOM.textContent = countNum + 1;
-        }
+        likeDOM(e);
         like(tweetId);
       });
     });
   });
+};
+
+const showUserInfo = async (e) => {
+  e.preventDefault();
+  let UserId = e.target.dataset.id;
+  // console.log(UserId);
+  let params = new URLSearchParams(window.location.search);
+  params.set('user', UserId);
+  // console.log(params);
+
+  location.href = `/user.html?${encodeURIComponent(params)}`;
+};
+
+const likeDOM = (e) => {
+  e.preventDefault();
+  let likeSVG;
+  e.target.classList.length === 0
+    ? (likeSVG = e.target.parentElement)
+    : (likeSVG = e.target);
+  let status = likeSVG.classList.contains('alreadyLiked');
+  let countDOM = likeSVG.nextSibling.nextSibling;
+  let countNum = Number(likeSVG.nextSibling.nextSibling.textContent);
+  if (status) {
+    likeSVG.classList.remove('alreadyLiked');
+    likeSVG.classList.add('notLiked');
+    countDOM.textContent = countNum - 1;
+  } else {
+    likeSVG.classList.remove('notLiked');
+    likeSVG.classList.add('alreadyLiked');
+    countDOM.textContent = countNum + 1;
+  }
 };
 
 const like = async (id) => {
@@ -127,11 +154,7 @@ const like = async (id) => {
 
 displayTweets();
 
-window.addEventListener('load', async () => {
-  let tweets = await fetch('/api/v1/tweets');
-  tweets.status === 401 ? window.location.replace('/') : null;
-  displayTweets();
-});
+// export default UserId;
 
 {
   /* <div class='tweet-info-counts'>

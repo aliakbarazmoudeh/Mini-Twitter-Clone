@@ -26,7 +26,7 @@ const getAllTweets = async (req, res) => {
   const tweets = await Tweet.findAll({
     include: {
       model: User,
-      attributes: ['name', 'username', 'profile', 'official'],
+      attributes: ['id', 'name', 'username', 'profile', 'official'],
     },
     order: [['createdAt', 'desc']],
   });

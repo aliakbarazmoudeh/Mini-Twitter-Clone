@@ -22,5 +22,8 @@ router
   .patch(authenticateUser, updateUser);
 router.route('/profile').patch(authenticateUser, updateProfileUser);
 router.route('/:id').get(getSingleUser);
+router.route('/..').get((req, res) => {
+  res.send(req.url);
+});
 
 module.exports = router;

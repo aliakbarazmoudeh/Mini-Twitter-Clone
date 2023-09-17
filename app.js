@@ -11,7 +11,6 @@ const server = http.createServer(app);
 const IP = require('ip');
 var io = require('socket.io');
 
-
 // SMTP server
 const SMTPServer = require('smtp-server').SMTPServer;
 
@@ -26,13 +25,13 @@ const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
 
 // use packages
-app.set('trust proxy', 1);
-app.use(
-  rateLimiter({
-    windowMs: 15 * 60 * 1000,
-    max: 60,
-  })
-);
+// app.set('trust proxy', 1);
+// app.use(
+//   rateLimiter({
+//     windowMs: 15 * 60 * 1000,
+//     max: 60,
+//   })
+// );
 app.use(express.json());
 app.use(fileUpload());
 app.use(helmet());

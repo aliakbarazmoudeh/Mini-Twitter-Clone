@@ -12,6 +12,13 @@ const nameDOM = document.querySelector('.profile h1'),
 
 let userInfo, Followers;
 
+window.addEventListener('beforeunload', () => {
+  window.history.pushState('/gibrish');
+  // window.location.href = '/profile.html';
+});
+
+// window.addEventListener('reset')
+
 const followingsTemplate = (data, status) => {
   Container.innerHTML = data
     .map((obj) => {
@@ -111,5 +118,6 @@ const fetchCurrentUser = async () => {
 };
 window.addEventListener('load', async () => {
   await fetchCurrentUser();
+  window.history.pushState({}, '', 'gibrish');
   activateNavBtns();
 });
