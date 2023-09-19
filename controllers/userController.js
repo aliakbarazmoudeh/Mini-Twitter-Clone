@@ -133,18 +133,53 @@ const updateProfileUser = async (req, res) => {
 };
 
 const getSingleUser = async (req, res) => {
-  const { id: UserId } = req.params;
-  if (!UserId)
-    throw new customError.BadRequestError('User Id must be provided');
-  const user = await User.findByPk(UserId, {
-    include: Tweet,
+  let user = await User.findByPk(req.params.id, {
+    include: [
+      {
+        model: Tweet,
+        attributes: ['text', 'numOfLikes', 'created'],
+      },
+      {
+        model: Following,
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'following', 'Follower'],
+        },
+        include: [
+          { model: User, attributes: ['name', 'username'], as: 'followings' },
+        ],
+      },
+      {
+        model: BookMark,
+        include: [
+          {
+            model: Tweet,
+            attributes: ['text', 'numOfLikes', 'created'],
+            include: [{ model: User, attributes: ['name', 'username'] }],
+          },
+        ],
+      },
+    ],
     order: [[{ model: Tweet }, 'updatedAt', 'desc']],
+    attributes: [
+      'id',
+      'name',
+      'username',
+      'email',
+      'profile',
+      'biography',
+      'official',
+    ],
   });
-  if (!user)
-    throw new customError.NotFoundError(
-      `cant find any user with this User ID : ${UserId}`
-    );
-  res.redirect('http://localhost:5000/user.html');
+  const Followers = await Following.findAll({
+    where: { following: req.params.id },
+    include: [
+      { model: User, attributes: ['name', 'username'], as: 'Followers' },
+    ],
+    attributes: {
+      exclude: ['following', 'Follower', 'createdAt', 'updatedAt'],
+    },
+  });
+  res.status(StatusCodes.OK).json({ user, Followers });
 };
 
 const follow = async (req, res) => {

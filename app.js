@@ -51,10 +51,13 @@ app.get('/', (req, res) => {
 });
 
 const SocketService = require('./socket');
-var io = new SocketService(server);
-app.use(function (req, res, next) {
-  req.io = io;
-  next();
+io = new SocketService(server);
+io.on('connection', function (socket) {
+  console.log('object');
+  app.use(function (req, res, next) {
+    req.io = io;
+    next();
+  });
 });
 
 app.use('/api/v1/users', userRouter);

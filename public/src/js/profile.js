@@ -1,3 +1,4 @@
+import { tweetsTemplate, activateNavBtns } from './templates/profile.js';
 const nameDOM = document.querySelector('.profile h1'),
   usernameDOM = document.querySelector('.profile span'),
   bioDOM = document.querySelector('.profile p'),
@@ -10,94 +11,84 @@ const nameDOM = document.querySelector('.profile h1'),
   ContainerTitle = document.querySelector('nav a'),
   profilePic = document.querySelector('.avatar');
 
-let userInfo, Followers;
+// let userInfo, Followers;
 
-window.addEventListener('beforeunload', () => {
-  window.history.pushState('/gibrish');
-  // window.location.href = '/profile.html';
-});
+// const followingsTemplate = (data, status) => {
+//   Container.innerHTML = data
+//     .map((obj) => {
+//       let user = obj[status];
+//       return `<li>
+//   <div class="info">
+//   <strong>${user.name}<span> @${user.username}</span></strong>
+//   </div>
+//   <div class="btn">
+//     <button>${status == 'followings' ? 'Unfollow' : 'Remove'}</button>
+//   </div>
+//   </li>`;
+//     })
+//     .join('');
+// };
 
-// window.addEventListener('reset')
+// const bookMarksTemplate = (bookMarks) => {
+//   Container.innerHTML = bookMarks
+//     .map(({ Tweet: tweet, Tweet: { User: user } }) => {
+//       return `<li>
+//   <div class="info">
+//   <strong>${user.name}<span>@${user.username}</span></strong>
+//   <p>${tweet.text}</p>
+//   <div class="actions">
+//   <a href=""><img src="./src/images/like.svg" alt="Like">${tweet.numOfLikes}</a>
+//   </div>
+//   </div>
+//   </li>`;
+//     })
+//     .join('');
+// };
 
-const followingsTemplate = (data, status) => {
-  Container.innerHTML = data
-    .map((obj) => {
-      let user = obj[status];
-      return `<li>
-  <div class="info">
-  <strong>${user.name}<span> @${user.username}</span></strong>
-  </div>
-  <div class="btn">
-    <button>${status == 'followings' ? 'Unfollow' : 'Remove'}</button>
-  </div>
-  </li>`;
-    })
-    .join('');
-};
+// const tweetsTemplate = (user) => {
+//   const { Tweets } = user;
+//   Container.innerHTML = Tweets.map((tweet) => {
+//     return `<li>
+//   <div class="info">
+//   <strong>${user.name}<span>@${user.username}</span></strong>
+//   <p>${tweet.text}</p>
+//   <div class="actions">
+//   <a href=""><img src="./src/images/like.svg" alt="Like">${tweet.numOfLikes}</a>
+//   </div>
+//   </div>
+//   </li>`;
+//   }).join(' ');
+// };
 
-const bookMarksTemplate = (bookMarks) => {
-  Container.innerHTML = bookMarks
-    .map(({ Tweet: tweet, Tweet: { User: user } }) => {
-      return `<li>
-  <div class="info">
-  <strong>${user.name}<span>@${user.username}</span></strong>
-  <p>${tweet.text}</p>
-  <div class="actions">
-  <a href=""><img src="./src/images/like.svg" alt="Like">${tweet.numOfLikes}</a>
-  </div>
-  </div>
-  </li>`;
-    })
-    .join('');
-};
-
-const tweetsTemplate = (user) => {
-  const { Tweets } = user;
-  Container.innerHTML = Tweets.map((tweet) => {
-    return `<li>
-  <div class="info">
-  <strong>${user.name}<span>@${user.username}</span></strong>
-  <p>${tweet.text}</p>
-  <div class="actions">
-  <a href=""><img src="./src/images/like.svg" alt="Like">${tweet.numOfLikes}</a>
-  </div>
-  </div>
-  </li>`;
-  }).join(' ');
-};
-
-const activateNavBtns = async () => {
-  navBtnDOM.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      navBtnDOM.forEach((btn) => {
-        btn.classList.remove('active');
-      });
-      btn.classList.add('active');
-      const btnId = btn.dataset.id;
-      ContainerTitle.textContent = btnId;
-      if (btn.dataset.id === 'Followers') {
-        followingsTemplate(Followers, 'Followers');
-      }
-      if (btnId === 'Followings') {
-        followingsTemplate(userInfo[btnId], 'followings');
-      }
-      if (btnId === 'Tweets') {
-        tweetsTemplate(userInfo);
-      }
-      if (btnId === 'BookMarks') {
-        bookMarksTemplate(userInfo[btnId]);
-      }
-    });
-  });
-};
+// const activateNavBtns = async () => {
+//   navBtnDOM.forEach((btn) => {
+//     btn.addEventListener('click', () => {
+//       navBtnDOM.forEach((btn) => {
+//         btn.classList.remove('active');
+//       });
+//       btn.classList.add('active');
+//       const btnId = btn.dataset.id;
+//       ContainerTitle.textContent = btnId;
+//       if (btn.dataset.id === 'Followers') {
+//         followingsTemplate(Followers, 'Followers');
+//       }
+//       if (btnId === 'Followings') {
+//         followingsTemplate(userInfo[btnId], 'followings');
+//       }
+//       if (btnId === 'Tweets') {
+//         tweetsTemplate(userInfo);
+//       }
+//       if (btnId === 'BookMarks') {
+//         bookMarksTemplate(userInfo[btnId]);
+//       }
+//     });
+//   });
+// };
 
 const fetchCurrentUser = async () => {
   const response = await fetch(`/api/v1/users`);
   const { user: currentUser, Followers: followers } = await response.json();
-  console.log(currentUser);
   const { Tweets, Followings, BookMarks } = currentUser;
-  userInfo = currentUser;
-  Followers = followers;
   numOfTweets.textContent = Tweets.length;
   nameDOM.textContent = currentUser.name;
   profilePic.src = currentUser.profile;
@@ -115,9 +106,8 @@ const fetchCurrentUser = async () => {
     ? (bookMarkDOM.textContent = BookMarks.length)
     : (bookMarkDOM.textContent = '0');
   tweetsTemplate(currentUser);
+  activateNavBtns(currentUser, followers);
 };
 window.addEventListener('load', async () => {
   await fetchCurrentUser();
-  window.history.pushState({}, '', 'gibrish');
-  activateNavBtns();
 });

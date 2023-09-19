@@ -18,35 +18,49 @@ tweetBox();
 
 const displayTweets = async () => {
   socket.on('tweets', async ({ tweets }) => {
+    console.log(tweets);
     let likes = await fetch('/api/v1/tweets/likes', {
       method: 'POST',
     });
     likes = await likes.json();
     tweetsContainer.innerHTML = '';
     tweetsContainer.innerHTML = tweets
-      .map(({ id, text, User: user, created, numOfLikes }) => {
-        let liked = likes.find((tweet) => tweet.tweetId === id);
-
-        return `
+      .map(
+        ({
+          'followings.Tweets.id': id,
+          'followings.Tweets.UserId': UserId,
+          'followings.Tweets.text': text,
+          'followings.official': official,
+          'followings.name': name,
+          'followings.username': username,
+          'followings.Tweets.created': created,
+          'followings.Tweets.numOfLikes': numOfLikes,
+          'followings.profile': profile,
+        }) => {
+          if (text === null) {
+            return;
+          }
+          let liked = likes.find((tweet) => tweet.tweetId === id);
+          return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
           <img src=${
-            user.profile ? user.profile : './src/profiles/default_profile.png'
-          } alt="" class="avator" data-id=${user.id}>
+            profile ? profile : './src/profiles/default_profile.png'
+          } alt="" class="avator" data-id=${UserId}>
           <div class="tweet-header-info">
-        
-            ${user.name}
+
+            ${name}
             ${
-              user.official
+              official
                 ? "<img class='blue-check' src='./src/images/Check Mark Badge.png' alt=''></img>"
                 : ''
             }
-            <span>@${user.username}</span>
+            <span>@${username}</span>
             <span>. ${created}
             </span>
             <p class="test">${text}</p>
             </div>
-            
+
             </div>
         <div class="tweet-info-counts">
           <div class='likes'>
@@ -71,9 +85,10 @@ const displayTweets = async () => {
   </div>
         </div>
       </div>
-      
+
     `;
-      })
+        }
+      )
       .join(' ');
     const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
     const avators = tweetsContainer.querySelectorAll('.avator');
@@ -91,16 +106,14 @@ const displayTweets = async () => {
       });
     });
   });
+  // console.log(await tweets.json());
 };
 
 const showUserInfo = async (e) => {
   e.preventDefault();
   let UserId = e.target.dataset.id;
-  // console.log(UserId);
   let params = new URLSearchParams(window.location.search);
   params.set('user', UserId);
-  // console.log(params);
-
   location.href = `/user.html?${encodeURIComponent(params)}`;
 };
 

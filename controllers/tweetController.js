@@ -5,6 +5,8 @@ const User = require('../models/User');
 const checkPermission = require('../utils/checkPermission');
 const createdDate = require('../utils/date');
 const Like = require('../models/Like');
+const Following = require('../models/following');
+const { where, Sequelize } = require('sequelize');
 
 const getSingleTweet = async (req, res) => {
   const tweet = await Tweet.findByPk(req.params.id, {
@@ -23,17 +25,27 @@ const getSingleTweet = async (req, res) => {
 };
 
 const getAllTweets = async (req, res) => {
-  const tweets = await Tweet.findAll({
-    include: {
-      model: User,
-      attributes: ['id', 'name', 'username', 'profile', 'official'],
-    },
-    order: [['createdAt', 'desc']],
+  let tweets = await Following.findAll({
+    where: { Follower: req.user.UserId },
+    raw: true,
+    include: [
+      {
+        model: User,
+        as: 'followings',
+        attributes: ['id', 'name', 'username', 'profile', 'official'],
+        include: { model: Tweet },
+      },
+    ],
+    order: [[Sequelize.col('followings.Tweets.createdAt'), 'desc']],
   });
   let { tweetId } = req.body;
   const LikedTweet = await Like.findAll();
-  req.io.emiter('liked', { LikedTweet });
+  // req.io.emiter('liked', { LikedTweet });
   req.io.emiter('tweets', { tweets });
+  // console.log(req.io.on);
+  // req.io.on('connection', (socket) => {
+  //   socket.emiter('tweets', { tweets });
+  // });
   res.status(StatusCodes.OK);
 };
 
