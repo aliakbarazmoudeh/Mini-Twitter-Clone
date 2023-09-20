@@ -3,6 +3,7 @@ const { verifyToken } = require('../utils/jwt');
 const authenticateUser = async (req, res, next) => {
   try {
     const payload = verifyToken(req.signedCookies.token);
+    // console.log(req.signedCookies);
     if (payload) {
       req.user = payload;
       next();

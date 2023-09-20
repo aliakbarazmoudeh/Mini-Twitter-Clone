@@ -6,10 +6,11 @@ const express = require('express');
 const app = express();
 const connectDB = require('./db/connectDB');
 const PORT = process.env.PORT || 5000;
-const http = require('http');
-const server = http.createServer(app);
+const { createServer } = require('http');
+const server = createServer(app);
 const IP = require('ip');
-var io = require('socket.io');
+const { Server } = require('socket.io');
+const io = new Server(server);
 
 // SMTP server
 const SMTPServer = require('smtp-server').SMTPServer;
@@ -48,16 +49,6 @@ const dns = require('dns');
 app.use(express.static(path.resolve(__dirname, './public')));
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, './public', 'login.html'));
-});
-
-const SocketService = require('./socket');
-io = new SocketService(server);
-io.on('connection', function (socket) {
-  console.log('object');
-  app.use(function (req, res, next) {
-    req.io = io;
-    next();
-  });
 });
 
 app.use('/api/v1/users', userRouter);

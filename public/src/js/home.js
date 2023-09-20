@@ -16,32 +16,32 @@ const tweetBox = async () => {
 
 tweetBox();
 
-const displayTweets = async () => {
-  socket.on('tweets', async ({ tweets }) => {
-    console.log(tweets);
-    let likes = await fetch('/api/v1/tweets/likes', {
-      method: 'POST',
-    });
-    likes = await likes.json();
-    tweetsContainer.innerHTML = '';
-    tweetsContainer.innerHTML = tweets
-      .map(
-        ({
-          'followings.Tweets.id': id,
-          'followings.Tweets.UserId': UserId,
-          'followings.Tweets.text': text,
-          'followings.official': official,
-          'followings.name': name,
-          'followings.username': username,
-          'followings.Tweets.created': created,
-          'followings.Tweets.numOfLikes': numOfLikes,
-          'followings.profile': profile,
-        }) => {
-          if (text === null) {
-            return;
-          }
-          let liked = likes.find((tweet) => tweet.tweetId === id);
-          return `
+export const displayTweets = async () => {
+  let tweets = await fetch('/api/v1/tweets');
+  tweets = await tweets.json();
+  let likes = await fetch('/api/v1/tweets/likes', {
+    method: 'POST',
+  });
+  likes = await likes.json();
+  tweetsContainer.innerHTML = '';
+  tweetsContainer.innerHTML = tweets
+    .map(
+      ({
+        'followings.Tweets.id': id,
+        'followings.Tweets.UserId': UserId,
+        'followings.Tweets.text': text,
+        'followings.official': official,
+        'followings.name': name,
+        'followings.username': username,
+        'followings.Tweets.created': created,
+        'followings.Tweets.numOfLikes': numOfLikes,
+        'followings.profile': profile,
+      }) => {
+        if (text === null) {
+          return;
+        }
+        let liked = likes.find((tweet) => tweet.tweetId === id);
+        return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
           <img src=${
@@ -87,26 +87,24 @@ const displayTweets = async () => {
       </div>
 
     `;
-        }
-      )
-      .join(' ');
-    const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
-    const avators = tweetsContainer.querySelectorAll('.avator');
-    avators.forEach((avator) => {
-      avator.addEventListener('click', (e) => {
-        showUserInfo(e);
-      });
-    });
-    likeBtns.forEach((likeBtn) => {
-      const tweetId =
-        likeBtn.parentElement.parentElement.parentElement.dataset.id;
-      likeBtn.addEventListener('click', async (e) => {
-        likeDOM(e);
-        like(tweetId);
-      });
+      }
+    )
+    .join(' ');
+  const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
+  const avators = tweetsContainer.querySelectorAll('.avator');
+  avators.forEach((avator) => {
+    avator.addEventListener('click', (e) => {
+      showUserInfo(e);
     });
   });
-  // console.log(await tweets.json());
+  likeBtns.forEach((likeBtn) => {
+    const tweetId =
+      likeBtn.parentElement.parentElement.parentElement.dataset.id;
+    likeBtn.addEventListener('click', async (e) => {
+      likeDOM(e);
+      like(tweetId);
+    });
+  });
 };
 
 const showUserInfo = async (e) => {
@@ -165,9 +163,9 @@ const like = async (id) => {
   }
 };
 
-displayTweets();
+// displayTweets();
 
-// export default UserId;
+export default displayTweets;
 
 {
   /* <div class='tweet-info-counts'>

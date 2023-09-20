@@ -7,9 +7,6 @@ class SocketService {
   emiter(event, body) {
     if (body) this.io.emit(event, body);
   }
-  on(event, body) {
-    if (body) this.io.on(event, body);
-  }
 }
 
 module.exports = SocketService;
