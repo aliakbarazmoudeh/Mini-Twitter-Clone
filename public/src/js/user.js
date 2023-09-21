@@ -8,6 +8,7 @@ import {
 let params = new URLSearchParams(decodeURIComponent(window.location.search));
 let UserId = params.get('user');
 let userInfo, Followers;
+
 const nameDOM = document.querySelector('.profile h1'),
   usernameDOM = document.querySelector('.profile span'),
   bioDOM = document.querySelector('.profile p'),

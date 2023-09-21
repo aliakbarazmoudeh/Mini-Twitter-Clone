@@ -6,7 +6,8 @@ const checkPermission = require('../utils/checkPermission');
 const createdDate = require('../utils/date');
 const Like = require('../models/Like');
 const Following = require('../models/following');
-const { Sequelize } = require('sequelize');
+const { Sequelize, where } = require('sequelize');
+const sequelize = require('../db/connectDB');
 
 const getSingleTweet = async (req, res) => {
   const tweet = await Tweet.findByPk(req.params.id, {
@@ -24,7 +25,7 @@ const getSingleTweet = async (req, res) => {
   res.status(StatusCodes.OK).json(tweet);
 };
 
-const getAllTweets = async (req, res) => {
+const getTweets = async (req, res) => {
   let tweets = await Following.findAll({
     where: { Follower: req.user.UserId },
     raw: true,
@@ -38,9 +39,27 @@ const getAllTweets = async (req, res) => {
     ],
     order: [[Sequelize.col('followings.Tweets.createdAt'), 'desc']],
   });
-  // let { tweetId } = req.body;
-  // const LikedTweet = await Like.findAll();
   res.status(StatusCodes.OK).json(tweets);
+};
+
+const getAllTweets = async (req, res) => {
+  const word = req.params.word;
+  const allTweets = await Tweet.findAll({
+    where: {
+      text: sequelize.where(
+        sequelize.fn('LOWER', sequelize.col('text')),
+        'LIKE',
+        '%' + word + '%'
+      ),
+    },
+    include: [
+      {
+        model: User,
+        attributes: ['id', 'name', 'username', 'profile', 'official'],
+      },
+    ],
+  });
+  res.status(StatusCodes.OK).json(allTweets);
 };
 
 const createTweet = async (req, res) => {
@@ -115,6 +134,7 @@ const getAllLikedTweet = async (req, res) => {
 };
 
 module.exports = {
+  getTweets,
   getAllTweets,
   getSingleTweet,
   updateTweet,

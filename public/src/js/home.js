@@ -1,5 +1,44 @@
 const tweetsContainer = document.querySelector('section');
 const profilePic = document.querySelector('.profil-picture');
+const asideInput = document.querySelector('.aside_input input'),
+  asideContainer = document.querySelector('.aside_container');
+asideInput.addEventListener('keyup', async () => {
+  if (asideInput.value === '') {
+    asideContainer.innerHTML = '';
+    return;
+  }
+  let Alltweets = await fetch(`/api/v1/tweets/${asideInput.value}`);
+  Alltweets = await Alltweets.json();
+  console.log(Alltweets);
+  asideContainer.innerHTML = '';
+  asideContainer.innerHTML = Alltweets.map(
+    ({ text, id, User: user, created }) => {
+      return `
+      <div class="tweet-wrap" data-id="${id}">
+        <div class="tweet-header">
+          <img src=${
+            user.profile ? user.profile : './src/profiles/default_profile.png'
+          } alt="" class="avator" data-id="">
+          <div class="tweet-header-info">
+
+            ${user.name}
+            ${
+              user.official
+                ? "<img class='blue-check' src='./src/images/Check Mark Badge.png' alt=''></img>"
+                : ''
+            }
+            <span>@${user.username}</span>
+            <p class="test">${text}</p>
+            </div>
+
+            </div>
+        </div>
+      </div>
+
+    `;
+    }
+  ).join(' ');
+});
 const socket = io();
 
 window.addEventListener('load', async () => {
@@ -27,6 +66,7 @@ export const displayTweets = async () => {
   tweetsContainer.innerHTML = tweets
     .map(
       ({
+        Follower,
         'followings.Tweets.id': id,
         'followings.Tweets.UserId': UserId,
         'followings.Tweets.text': text,
@@ -40,13 +80,14 @@ export const displayTweets = async () => {
         if (text === null) {
           return;
         }
+        // console.log(Follower, UserId);
         let liked = likes.find((tweet) => tweet.tweetId === id);
         return `
       <div class="tweet-wrap" data-id="${id}">
         <div class="tweet-header">
           <img src=${
             profile ? profile : './src/profiles/default_profile.png'
-          } alt="" class="avator" data-id=${UserId}>
+          } alt="" class="avator" data-id="${UserId};${Follower}">
           <div class="tweet-header-info">
 
             ${name}
@@ -107,12 +148,16 @@ export const displayTweets = async () => {
   });
 };
 
+export default displayTweets;
+
 const showUserInfo = async (e) => {
   e.preventDefault();
-  let UserId = e.target.dataset.id;
+  let [UserId, Follower] = e.target.dataset.id.split(';');
   let params = new URLSearchParams(window.location.search);
   params.set('user', UserId);
-  location.href = `/user.html?${encodeURIComponent(params)}`;
+  Follower === UserId
+    ? (location.href = '/profile.html')
+    : (location.href = `/user.html?${encodeURIComponent(params)}`);
 };
 
 const likeDOM = (e) => {
@@ -164,8 +209,6 @@ const like = async (id) => {
 };
 
 // displayTweets();
-
-export default displayTweets;
 
 {
   /* <div class='tweet-info-counts'>
