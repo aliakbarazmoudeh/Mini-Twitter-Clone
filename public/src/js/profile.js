@@ -3,12 +3,9 @@ const nameDOM = document.querySelector('.profile h1'),
   usernameDOM = document.querySelector('.profile span'),
   bioDOM = document.querySelector('.profile p'),
   numOfTweets = document.querySelector('.tweets-count'),
-  Container = document.querySelector('.tweets'),
   followingDOM = document.querySelector('.followings-count'),
   followerDOM = document.querySelector('.followers-count'),
   bookMarkDOM = document.querySelector('.book-mark-count'),
-  navBtnDOM = document.querySelectorAll('.container ul li'),
-  ContainerTitle = document.querySelector('nav a'),
   profilePic = document.querySelector('.avatar');
 
 const fetchCurrentUser = async () => {

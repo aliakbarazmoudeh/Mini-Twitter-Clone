@@ -31,6 +31,4 @@ submitBtn.addEventListener('click', async () => {
   }
   const userPayload = await response.json();
   console.log(userPayload);
-
-  // window.location.replace('/twitter.html');
 });

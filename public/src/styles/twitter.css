@@ -15,7 +15,8 @@ img {
   margin-right: 15px;
 }
 
-.tweet-wrap {
+.tweet-wrap,
+.profile-wrap {
   max-width: 490px;
   background: #fff;
   margin: 0 auto;
@@ -26,13 +27,15 @@ img {
   /* border-top: 1px solid #e6ecf0; */
 }
 
-.tweet-header {
+.tweet-header,
+.profile-header {
   display: flex;
   align-items: flex-start;
   font-size: 14px;
 }
 
-.tweet-header img {
+.tweet-header img,
+.profile-header img {
   height: 50px;
   width: 50px;
   object-fit: cover;
@@ -44,16 +47,19 @@ img {
   object-fit: cover;
 }
 
-.tweet-header-info {
+.tweet-header-info,
+.profile-header-info {
   font-weight: bold;
 }
 
-.tweet-header-info span {
+.tweet-header-info span,
+.profile-header-info span {
   color: #657786;
   font-weight: normal;
   margin-left: 5px;
 }
-.tweet-header-info p {
+.tweet-header-info p,
+.profile-header-info p {
   font-weight: normal;
   margin-top: 5px;
 }

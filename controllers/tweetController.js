@@ -45,13 +45,6 @@ const getTweets = async (req, res) => {
 const getAllTweets = async (req, res) => {
   const word = req.params.word;
   const allTweets = await Tweet.findAll({
-    where: {
-      text: sequelize.where(
-        sequelize.fn('LOWER', sequelize.col('text')),
-        'LIKE',
-        '%' + word + '%'
-      ),
-    },
     include: [
       {
         model: User,

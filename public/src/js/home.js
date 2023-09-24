@@ -1,214 +1,29 @@
-const tweetsContainer = document.querySelector('section');
-const profilePic = document.querySelector('.profil-picture');
-const asideInput = document.querySelector('.aside_input input'),
-  asideContainer = document.querySelector('.aside_container');
-asideInput.addEventListener('keyup', async () => {
-  if (asideInput.value === '') {
-    asideContainer.innerHTML = '';
-    return;
-  }
-  let Alltweets = await fetch(`/api/v1/tweets/${asideInput.value}`);
-  Alltweets = await Alltweets.json();
-  console.log(Alltweets);
-  asideContainer.innerHTML = '';
-  asideContainer.innerHTML = Alltweets.map(
-    ({ text, id, User: user, created }) => {
-      return `
-      <div class="tweet-wrap" data-id="${id}">
-        <div class="tweet-header">
-          <img src=${
-            user.profile ? user.profile : './src/profiles/default_profile.png'
-          } alt="" class="avator" data-id="">
-          <div class="tweet-header-info">
+import createTweet from './utils/createTweet.js';
+import displayTweets from './utils/displayTweets.js';
+import searchUser from './utils/searchUser.js';
 
-            ${user.name}
-            ${
-              user.official
-                ? "<img class='blue-check' src='./src/images/Check Mark Badge.png' alt=''></img>"
-                : ''
-            }
-            <span>@${user.username}</span>
-            <p class="test">${text}</p>
-            </div>
-
-            </div>
-        </div>
-      </div>
-
-    `;
-    }
-  ).join(' ');
-});
-const socket = io();
+const profilePic = document.querySelector('.profil-picture'),
+  asideInput = document.querySelector('.aside_input input'),
+  tweetBtn = document.querySelector('.tweet-btn'),
+  tweetText = document.querySelector('.tweet_box-input input');
 
 window.addEventListener('load', async () => {
+  let data = await fetch('/api/v1/users');
+  let { user } = await data.json();
+  profilePic.src = user.profile;
   let tweets = await fetch('/api/v1/tweets');
   tweets.status === 401 ? window.location.replace('/') : null;
   displayTweets();
 });
 
-const tweetBox = async () => {
-  let data = await fetch('/api/v1/users');
-  let { user } = await data.json();
-  profilePic.src = user.profile;
-};
+asideInput.addEventListener('keyup', () => {
+  searchUser();
+});
 
-tweetBox();
-
-export const displayTweets = async () => {
-  let tweets = await fetch('/api/v1/tweets');
-  tweets = await tweets.json();
-  let likes = await fetch('/api/v1/tweets/likes', {
-    method: 'POST',
-  });
-  likes = await likes.json();
-  tweetsContainer.innerHTML = '';
-  tweetsContainer.innerHTML = tweets
-    .map(
-      ({
-        Follower,
-        'followings.Tweets.id': id,
-        'followings.Tweets.UserId': UserId,
-        'followings.Tweets.text': text,
-        'followings.official': official,
-        'followings.name': name,
-        'followings.username': username,
-        'followings.Tweets.created': created,
-        'followings.Tweets.numOfLikes': numOfLikes,
-        'followings.profile': profile,
-      }) => {
-        if (text === null) {
-          return;
-        }
-        // console.log(Follower, UserId);
-        let liked = likes.find((tweet) => tweet.tweetId === id);
-        return `
-      <div class="tweet-wrap" data-id="${id}">
-        <div class="tweet-header">
-          <img src=${
-            profile ? profile : './src/profiles/default_profile.png'
-          } alt="" class="avator" data-id="${UserId};${Follower}">
-          <div class="tweet-header-info">
-
-            ${name}
-            ${
-              official
-                ? "<img class='blue-check' src='./src/images/Check Mark Badge.png' alt=''></img>"
-                : ''
-            }
-            <span>@${username}</span>
-            <span>. ${created}
-            </span>
-            <p class="test">${text}</p>
-            </div>
-
-            </div>
-        <div class="tweet-info-counts">
-          <div class='likes'>
-    <svg
-      class='feather feather-heart sc-dnqmqq jxshSx ${
-        liked ? 'alreadyLiked' : 'notLiked'
-      }'
-      xmlns='http://www.w3.org/2000/svg'
-      width='20'
-      height='20'
-      viewBox='0 0 24 24'
-      fill=${liked ? 'red' : 'none'}
-      stroke=${liked ? 'none' : 'black'}
-      stroke-width='2'
-      stroke-linecap='round'
-      stroke-linejoin='round'
-      aria-hidden='true'
-    >
-      <path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'></path>
-    </svg>
-    <div class='likes-count'>${numOfLikes}</div>
-  </div>
-        </div>
-      </div>
-
-    `;
-      }
-    )
-    .join(' ');
-  const likeBtns = tweetsContainer.querySelectorAll('.likes svg');
-  const avators = tweetsContainer.querySelectorAll('.avator');
-  avators.forEach((avator) => {
-    avator.addEventListener('click', (e) => {
-      showUserInfo(e);
-    });
-  });
-  likeBtns.forEach((likeBtn) => {
-    const tweetId =
-      likeBtn.parentElement.parentElement.parentElement.dataset.id;
-    likeBtn.addEventListener('click', async (e) => {
-      likeDOM(e);
-      like(tweetId);
-    });
-  });
-};
-
-export default displayTweets;
-
-const showUserInfo = async (e) => {
+tweetBtn.addEventListener('click', (e) => {
   e.preventDefault();
-  let [UserId, Follower] = e.target.dataset.id.split(';');
-  let params = new URLSearchParams(window.location.search);
-  params.set('user', UserId);
-  Follower === UserId
-    ? (location.href = '/profile.html')
-    : (location.href = `/user.html?${encodeURIComponent(params)}`);
-};
-
-const likeDOM = (e) => {
-  e.preventDefault();
-  let likeSVG;
-  e.target.classList.length === 0
-    ? (likeSVG = e.target.parentElement)
-    : (likeSVG = e.target);
-  let status = likeSVG.classList.contains('alreadyLiked');
-  let countDOM = likeSVG.nextSibling.nextSibling;
-  let countNum = Number(likeSVG.nextSibling.nextSibling.textContent);
-  if (status) {
-    likeSVG.classList.remove('alreadyLiked');
-    likeSVG.classList.add('notLiked');
-    countDOM.textContent = countNum - 1;
-  } else {
-    likeSVG.classList.remove('notLiked');
-    likeSVG.classList.add('alreadyLiked');
-    countDOM.textContent = countNum + 1;
-  }
-};
-
-const like = async (id) => {
-  let isLiked = await fetch('/api/v1/tweets/likes', {
-    method: 'POST',
-    body: JSON.stringify({ tweetId: id }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  isLiked = await isLiked.json();
-  if (isLiked.length === 0) {
-    const response = await fetch(`/api/v1/tweets/like/${id}`, {
-      method: 'POST',
-      body: JSON.stringify({ tweetId: id }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  } else {
-    const response = await fetch(`/api/v1/tweets/like/${id}`, {
-      method: 'DELETE',
-      body: JSON.stringify({ tweetId: id }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
-};
-
-// displayTweets();
+  createTweet(tweetText);
+});
 
 {
   /* <div class='tweet-info-counts'>

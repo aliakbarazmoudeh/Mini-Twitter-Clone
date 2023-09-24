@@ -4,6 +4,7 @@ import {
   bookMarksTemplate,
   followingsTemplate,
 } from './templates/profile.js';
+import follow from './utils/follow.js';
 
 let params = new URLSearchParams(decodeURIComponent(window.location.search));
 let UserId = params.get('user');
@@ -19,17 +20,28 @@ const nameDOM = document.querySelector('.profile h1'),
   bookMarkDOM = document.querySelector('.book-mark-count'),
   navBtnDOM = document.querySelectorAll('.container ul li'),
   ContainerTitle = document.querySelector('nav a'),
+  actionBtn = document.querySelector('.actions button'),
   profilePic = document.querySelector('.avatar');
+
+actionBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  follow(UserId, actionBtn);
+});
 
 const fetchUser = async () => {
   const response = await fetch(`/api/v1/users/${UserId}`);
+  let isFollowedResponse = await fetch(`/api/v1/users/follow/${UserId}`);
   const { user: currentUser, Followers: followers } = await response.json();
   const { Tweets, Followings, BookMarks } = currentUser;
+  const { isFollowed } = await isFollowedResponse.json();
   userInfo = currentUser;
   Followers = followers;
   numOfTweets.textContent = Tweets.length;
   nameDOM.textContent = currentUser.name;
-  profilePic.src = currentUser.profile;
+  profilePic.src = currentUser.profile
+    ? currentUser.profile
+    : './src/profiles/default_profile.png';
+  actionBtn.textContent = isFollowed ? 'Unfollow' : 'Follow';
   usernameDOM.textContent = currentUser.username;
   currentUser.biography
     ? (bioDOM.textContent = currentUser.biography)

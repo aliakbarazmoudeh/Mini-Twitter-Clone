@@ -8,6 +8,8 @@ const sendVerificationLink = require('../utils/verify');
 const Following = require('../models/following');
 const BookMark = require('../models/BookMark');
 const path = require('path');
+const sequelize = require('../db/connectDB');
+const Op = require('sequelize').Op;
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -61,6 +63,8 @@ const showCurrenUsre = async (req, res) => {
       },
       {
         model: Following,
+        where: { following: { [Op.ne]: req.user.UserId } },
+
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'following', 'Follower'],
         },
@@ -91,7 +95,10 @@ const showCurrenUsre = async (req, res) => {
     ],
   });
   const Followers = await Following.findAll({
-    where: { following: req.user.UserId },
+    where: {
+      following: req.user.UserId,
+      Follower: { [Op.ne]: req.user.UserId },
+    },
     include: [
       { model: User, attributes: ['name', 'username'], as: 'Followers' },
     ],
@@ -130,6 +137,21 @@ const updateProfileUser = async (req, res) => {
   user.profile = `./src/profiles/${productImage.name}`;
   user.save();
   res.json({ user });
+};
+
+const getAllUsers = async (req, res) => {
+  const word = req.params.word;
+  const users = await User.findAll({
+    where: {
+      id: { [Op.ne]: req.user.UserId },
+      username: sequelize.where(
+        sequelize.fn('LOWER', sequelize.col('username')),
+        'LIKE',
+        '%' + word + '%'
+      ),
+    },
+  });
+  res.status(StatusCodes.OK).json(users);
 };
 
 const getSingleUser = async (req, res) => {
@@ -187,10 +209,26 @@ const follow = async (req, res) => {
     Follower: req.user.UserId,
     following: req.body.id,
   });
-  res.json(following);
+  res.status(StatusCodes.OK).json(following);
+};
+
+const unfollow = async (req, res) => {
+  const following = await Following.findOne({
+    where: { Follower: req.user.UserId, following: req.body.id },
+  });
+  await following.destroy();
+  res.status(StatusCodes.OK).json(following);
+};
+
+const isFollowed = async (req, res) => {
+  const isFollowed = await Following.findOne({
+    where: { Follower: req.user.UserId, following: req.params.id },
+  });
+  res.status(StatusCodes.OK).json({ isFollowed: isFollowed ? true : false });
 };
 
 module.exports = {
+  getAllUsers,
   register,
   logIn,
   getSingleUser,
@@ -199,4 +237,6 @@ module.exports = {
   follow,
   updateUser,
   updateProfileUser,
+  isFollowed,
+  unfollow,
 };
